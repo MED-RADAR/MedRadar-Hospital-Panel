@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginApi } from '../../https';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../../Stores/authSlice';
@@ -34,14 +34,14 @@ const Login = () => {
         return toast.error('Server Error');
       }
       dispatch(setAuth(data));
-      toast.success('You have successfully signed in');
       if (data.data.approved) {
         navigate('/treatments');
       } else {
         navigate('/');
       }
     } catch (e) {
-      console.log(e);
+      toast.error(e.response.data.message);
+      setProcessing(false);
     }
   };
   return (
@@ -89,6 +89,12 @@ const Login = () => {
               Login
             </Button>
           )}
+          <p>
+            Don't have account ?{' '}
+            <span style={{ color: 'blue' }}>
+              <Link to={'/signup'}> Signup </Link>
+            </span>
+          </p>
         </form>
       </VStack>
     </Container>

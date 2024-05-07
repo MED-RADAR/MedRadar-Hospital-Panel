@@ -37,10 +37,9 @@ const LinkButton = ({ url = '/', title = 'Home', onClose }) => {
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
-  const isAuth = useSelector(state => state.auth.isAuth);
+  const {isAuth, approved} = useSelector(state => state.auth);
   const dispatch = useDispatch();
   const [processing, setProcessing] = useState(false);
-  // const approved = useSelector(state => state.auth.approved);
 
   const logoutHandler = async () => {
     setProcessing(true);
@@ -136,12 +135,12 @@ const Header = () => {
                         )}
                       </HStack>
 
-                      <Link to={'/treatments'} onClick={onClose}>
+                      {approved && <Link to={'/treatments'} onClick={onClose}>
                         <Button variant={'ghost'} colorScheme={'purple'}>
                           <RiDashboardFill style={{ margin: '4px' }} />
                           Dashboard
                         </Button>
-                      </Link>
+                      </Link>}
                     </VStack>
                   ) : (
                     <Link to={'/login'} onClick={onClose}>

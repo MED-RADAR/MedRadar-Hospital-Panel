@@ -1,27 +1,24 @@
 import {
   Box,
   Button,
-  Container,
   FormLabel,
   Grid,
   Heading,
   HStack,
+  Image,
   Input,
-  InputGroup,
-  InputLeftElement,
-  Link,
   Select,
   Spinner,
   Textarea,
-  useToast,
   VStack,
 } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
 import Sidebar from '../../components/Layout/Sidebar';
 import axios from 'axios';
-import { addDoctorApi } from '../../https';
+import { addDoctorApi, addDoctorsApi } from '../../https';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const AddDoctors = () => {
   const [firstName, setFirstName] = useState('');
@@ -35,7 +32,9 @@ const AddDoctors = () => {
   const [toUnit, setToUnit] = useState('');
   const [fromUnit, setFromUnit] = useState('');
   const [processing, setProcessing] = useState(false);
-
+  const [imagePrev, setImagePrev] = useState('');
+  const [image, setImage] = useState('');
+  const navigate = useNavigate();
   const addHandler = async () => {
     setProcessing(true);
     if (
@@ -54,7 +53,7 @@ const AddDoctors = () => {
       return toast.warn('All fields are mandatory');
     }
     try {
-      const processedData = {
+      let processedData = {
         name: firstName + ' ' + lastName,
         specialty,
         yearsOfExperience: experience + ' ' + experienceUnit,
@@ -62,12 +61,19 @@ const AddDoctors = () => {
         endTime: to + ' ' + toUnit,
         about,
       };
-      const { data } = await addDoctorApi(processedData);
+
+      if (image) {
+        processedData = { ...processedData, file: image };
+      }
+
+
+      const { data } = await addDoctorsApi(processedData);
       if (!data) {
         return toast.error('Server Error');
       }
       setProcessing(false);
       toast.success(data);
+      navigate('/doctors');
       setFirstName('');
       setLastName('');
       setAbout('');
@@ -78,12 +84,32 @@ const AddDoctors = () => {
       setFrom('');
       setToUnit('');
       setFromUnit('');
+    
     } catch (error) {
       console.log(error);
       setProcessing(false);
     }
   };
+  const fileUploadCss = {
+    cursor: 'pointer',
+    marginLeft: '-5%',
+    width: '110%',
+    border: 'none',
+    height: '100%',
+    color: '#ECC94B',
+    backgroundColor: 'white',
+  };
+  const changeImageHandler = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
 
+    reader.readAsDataURL(file);
+
+    reader.onloadend = () => {
+      setImagePrev(reader.result);
+      setImage(file);
+    };
+  };
   return (
     <Grid minH={'100vh'} templateColumns={['1fr', '1fr 5fr']}>
       <Sidebar />
@@ -100,6 +126,27 @@ const AddDoctors = () => {
             width: '80%',
           }}
         >
+          <Box marginY={'2'}>
+            <FormLabel htmlFor="name" children="Image (optional)" />
+            <VStack>
+              {imagePrev && (
+                <Image src={imagePrev} boxSize="64" objectFit={'contain'} />
+              )}
+              <Input
+                accept="image/*"
+                required
+                type={'file'}
+                focusBorderColor="purple.300"
+                css={{
+                  '&::file-selector-button': {
+                    ...fileUploadCss,
+                    color: 'purple',
+                  },
+                }}
+                onChange={changeImageHandler}
+              />
+            </VStack>
+          </Box>
           <Box marginY={'2'}>
             <FormLabel htmlFor="name" children="Name" />
             <HStack>

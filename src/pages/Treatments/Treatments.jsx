@@ -34,7 +34,6 @@ const Treatments = () => {
   const [loading, setLoading] = useState(false);
   // const [removeProcessing, setRemoveProcessing] = useState(false);
   const [treatments, setTreatments] = useState([]);
-
   const getTreatments = async () => {
     setLoading(true);
     try {
@@ -122,14 +121,16 @@ const Treatments = () => {
                   <Tr>
                     <Td>{index + 1}</Td>
                     <Td>{treatment.name}</Td>
-                    <Td>{treatment.duration}</Td>
                     <Td>{treatment.price}</Td>
+                    <Td>{treatment.duration}</Td>
                     <Td>
                       <Button
                         colorScheme="teal"
                         variant="outline"
                         // onClick={onOpen}
-                        onClick={() => {}}
+                        onClick={() => {
+                          navigate(`/view-treatment/${treatment._id}`);
+                        }}
                       >
                         View
                       </Button>
@@ -138,7 +139,9 @@ const Treatments = () => {
                       <Button
                         colorScheme="teal"
                         variant="solid"
-                        onClick={() => {}}
+                        onClick={() => {
+                          navigate(`/edit-treatment/${treatment._id}`);
+                        }}
                       >
                         Edit
                       </Button>

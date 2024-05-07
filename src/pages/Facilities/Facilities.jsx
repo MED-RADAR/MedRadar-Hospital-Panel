@@ -1,4 +1,3 @@
-
 import {
   Box,
   Grid,
@@ -19,6 +18,7 @@ import {
   Input,
   VStack,
   Image,
+  Spinner,
 } from '@chakra-ui/react';
 import React from 'react';
 import Sidebar from '../../components/Layout/Sidebar';
@@ -28,16 +28,52 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import facility1 from '../../Assets/Facilities/download.jpeg';
 import facility2 from '../../Assets/Facilities/download (1).jpeg';
+import { toast } from 'react-toastify';
+import { getFacilitiesApi, removeFacilityApi } from '../../https';
 
 const Facilities = () => {
   const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [students, setStudents] = useState([]);
   const [searchName, setSearchName] = useState('');
-  const [searchRegNo, setSearchRegNo] = useState('');
-
+  const [facilities, setFacilities] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const handleNameSearch = async () => {};
-  const handleRegSearch = async () => {};
+  const fetchFacilities = async () => {
+    setLoading(true);
+    try {
+      const { data } = await getFacilitiesApi();
+      if (!data) {
+        setLoading(false);
+        return toast.error('Server Error');
+      }
+      console.log(data);
+      setFacilities(data.facilities);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchFacilities();
+  }, []);
+
+  const handleRemove = async id => {
+    setProcessing(true);
+    try {
+      const { data } = await removeFacilityApi(id);
+      if (!data) {
+        return toast.error('Server Error');
+      }
+      toast.success(data);
+      fetchFacilities();
+      setProcessing(false);
+    } catch (error) {
+      setProcessing(false);
+      console.log(error);
+      toast.error('Something went wrong');
+    }
+  };
 
   return (
     <Grid minH={'100vh'} templateColumns={['1fr', '1fr 5fr']}>
@@ -73,66 +109,52 @@ const Facilities = () => {
             <TableCaption>Treatments</TableCaption>
             <Thead>
               <Tr>
+                <Th>Sr No.</Th>
                 <Th>Facility Name</Th>
                 <Th>Facility Image</Th>
                 <Th> </Th>
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>XYZ facility</Td>
-                <Td>
-                  <Image src={facility1} boxSize="64" objectFit={'contain'} />
-                </Td>
+              {facilities.map((facility, index) => {
+                return (
+                  <Tr key={index}>
+                    <Td>{index + 1}</Td>
+                    <Td>{facility.name}</Td>
+                    <Td>
+                      <Image
+                        src={facility.img.url}
+                        boxSize="64"
+                        objectFit={'contain'}
+                      />
+                    </Td>
 
-                <Td>
-                  <Button
-                    colorScheme="teal"
-                    variant="outline"
-                    // onClick={onOpen}
-                    onClick={() => {}}
-                  >
-                    Rename
-                  </Button>
-                </Td>
-                <Td>
-                  <Button colorScheme="teal" variant="solid" onClick={() => {}}>
-                    Update Image
-                  </Button>
-                </Td>
-                <Td>
-                  <Button variant="solid" colorScheme="red" onClick={() => {}}>
-                    Remove
-                  </Button>
-                </Td>
-              </Tr>
-              <Tr>
-                <Td>new XYZ facility</Td>
-                <Td>
-                  <Image src={facility2} boxSize="64" objectFit={'contain'} />
-                </Td>
-
-                <Td>
-                  <Button
-                    colorScheme="teal"
-                    variant="outline"
-                    // onClick={onOpen}
-                    onClick={() => {}}
-                  >
-                    Rename
-                  </Button>
-                </Td>
-                <Td>
-                  <Button colorScheme="teal" variant="solid" onClick={() => {}}>
-                    Update Image
-                  </Button>
-                </Td>
-                <Td>
-                  <Button variant="solid" colorScheme="red" onClick={() => {}}>
-                    Remove
-                  </Button>
-                </Td>
-              </Tr>
+                    <Td>
+                      {processing ? (
+                        <Button my="4" colorScheme={'red'}>
+                          <Spinner
+                            thickness="3px"
+                            speed="0.65s"
+                            emptyColor="gray.200"
+                            color="white.500"
+                            size="lg"
+                          />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="solid"
+                          colorScheme="red"
+                          onClick={() => {
+                            handleRemove(facility._id);
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </Td>
+                  </Tr>
+                );
+              })}
             </Tbody>
           </Table>
         </TableContainer>

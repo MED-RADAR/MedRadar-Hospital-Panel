@@ -116,27 +116,22 @@ const Doctors = () => {
               {doctors.map((doctor, index) => {
                 return (
                   <Tr>
-                    <Td>{index+1}</Td>
+                    <Td>{index + 1}</Td>
                     <Td>Dr. {doctor.name}</Td>
-                    <Td>{doctor.startTime} - {doctor.endTime}</Td>
+                    <Td>
+                      {doctor.startTime} - {doctor.endTime}
+                    </Td>
                     <Td>{doctor.specialty}</Td>
                     <Td>
                       <Button
                         colorScheme="teal"
                         variant="outline"
                         // onClick={onOpen}
-                        onClick={() => {}}
+                        onClick={() => {
+                          navigate(`/doctor/${doctor._id}`);
+                        }}
                       >
                         View
-                      </Button>
-                    </Td>
-                    <Td>
-                      <Button
-                        colorScheme="teal"
-                        variant="solid"
-                        onClick={() => {}}
-                      >
-                        Edit
                       </Button>
                     </Td>
                     <Td>

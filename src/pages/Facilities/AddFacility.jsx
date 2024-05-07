@@ -1,31 +1,51 @@
 import {
   Box,
   Button,
-  Container,
   FormLabel,
   Grid,
   Heading,
   HStack,
   Image,
   Input,
-  InputGroup,
-  InputLeftElement,
-  Link,
-  Select,
-  Textarea,
-  useToast,
+  Spinner,
   VStack,
 } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
-import { FaPhoneAlt, FaWhatsapp } from 'react-icons/fa';
+import React, { useState } from 'react';
 import Sidebar from '../../components/Layout/Sidebar';
-import axios from 'axios';
+import { toast } from 'react-toastify';
+import { addFacilityApi } from '../../https';
+import { useNavigate } from 'react-router-dom';
 
 const AddFacility = () => {
-  const [imagePrev, setImagePrev] = useState('');  
+  const [imagePrev, setImagePrev] = useState('');
   const [image, setImage] = useState('');
-  const [title , setTitle] = useState('');
-  const loginHandler = async () => {};
+  const [title, setTitle] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const navigate = useNavigate();
+  const loginHandler = async e => {
+    e.preventDefault();
+    setProcessing(true);
+    if (!image || !title) {
+      return toast.warn('All fields are mandatory');
+    }
+    try {
+      const { data } = await addFacilityApi({ facility: title, file: image });
+      if (!data) {
+        return toast.error('Server Error');
+      }
+      if (data) {
+        toast.success(data);
+        setProcessing(false);
+        navigate('/facilities');
+      } else {
+        setProcessing(false);
+        navigate('/');
+      }
+    } catch (e) {
+      toast.error(e.response.data.message);
+      setProcessing(false);
+    }
+  };
   const fileUploadCss = {
     cursor: 'pointer',
     marginLeft: '-5%',
@@ -96,9 +116,21 @@ const AddFacility = () => {
             </HStack>
           </Box>
 
-          <Button my="4" colorScheme={'yellow'} onClick={loginHandler}>
-            + Add
-          </Button>
+          {processing ? (
+            <Button my="4" colorScheme={'yellow'}>
+              <Spinner
+                thickness="3px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="red.500"
+                size="lg"
+              />
+            </Button>
+          ) : (
+            <Button my="4" colorScheme={'yellow'} onClick={loginHandler}>
+              Add
+            </Button>
+          )}
         </form>
       </VStack>
     </Grid>
