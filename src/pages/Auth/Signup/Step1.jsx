@@ -156,7 +156,7 @@ const Step1 = ({ nextStep }) => {
           <p>
             Already have an account ?{' '}
             <span style={{ color: 'blue' }}>
-              <Link to={'/signin'}> SignIn </Link>
+              <Link to={'/login'}> SignIn </Link>
             </span>
           </p>
         </form>

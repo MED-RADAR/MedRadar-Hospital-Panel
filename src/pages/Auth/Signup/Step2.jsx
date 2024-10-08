@@ -136,7 +136,7 @@ const Step2 = ({ backStep }) => {
           <p>
             Already have an account ?{' '}
             <span style={{ color: 'blue' }}>
-              <Link to={'/signin'}> SignIn </Link>
+              <Link to={'/login'}> SignIn </Link>
             </span>
           </p>
         </form>

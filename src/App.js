@@ -27,6 +27,7 @@ import Home from './pages/Home/Home';
 function App() {
   const loading = useLoadingWithRefresh();
   // console.log(hospital);
+  
   return (
     <Router>
       <ToastContainer />
@@ -139,6 +140,7 @@ function App() {
 
 const ApproveProtectedRoute = ({ children }) => {
   const location = useLocation();
+  console.log(location);
   const { approved, isAuth } = useSelector(state => state.auth);
   if (!isAuth) {
     return <Navigate to="/login" state={{ from: location }} replace />;
